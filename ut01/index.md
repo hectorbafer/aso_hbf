@@ -1,6 +1,6 @@
 # Prácticas UT01
 
-## [Voler a la página principa](..\index.md)
+[Voler a la página principal](..\index.md)
 
 ### [PR0101](pr0101/pr0101.md)
 
