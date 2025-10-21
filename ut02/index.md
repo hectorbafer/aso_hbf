@@ -6,4 +6,4 @@
 
 ### [📄 PR0202: Conexión remota con SSH](pr0202/pr0202.md)
 
-### [📄 PR0204: Gestión de procesos en Linuxñ](pr0204/pr0204.md)
+### [📄 PR0204: Gestión de procesos en Linux](pr0204/pr0204.md)
