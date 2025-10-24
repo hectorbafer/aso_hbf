@@ -8,7 +8,7 @@
 
 ### [📄 PR0204: Gestión de procesos en Linux](pr0204/pr0204.md)
 
-### [📄 PR0205: Programación de tareas con cron](pr0205/pr0205.md)
+### [📄 PR0205: Programación de tareas con `cron`](pr0205/pr0205.md)
 
 ---
 ### [⬅️ Volver a la página principal](../index.md)
