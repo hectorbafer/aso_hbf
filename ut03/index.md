@@ -2,7 +2,7 @@
 
 ### [📄 PR0301: Condicional `if`](pr0301/pr0301.md)
 
-### [📄 PR0302a: Ejercicios comando `case`](pr0302a/pr0302a.md)
+### [📄 PR0302: Ejercicios comando `case`](pr0302/pr0302.md)
 
 ### [📄 PR0303: Ejercicios sobre los comandos `while`, `until` y `for`](pr0303/pr0303.md)
 
