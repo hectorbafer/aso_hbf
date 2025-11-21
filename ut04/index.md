@@ -4,6 +4,8 @@
 
 ### [📄 PR0402: Carpetas personales y compartidas por un grupo](pr0402/pr0402.md)
 
+### [📄 PR0403: Aplicación de GPOs y Seguridad](pr0403/pr0403.md)
+
 ---
 ### [⬅️ Volver a la página principal](../index.md)
 ---
