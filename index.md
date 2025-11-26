@@ -1,6 +1,6 @@
 # 💻 Página principal
 ## [💾 Reposotirio GitHub](https://github.com/hectorbafer/aso_hbf)
-## Temas 🔻
+## Temas ⬇️
 
 ### 📚 [UT01: REPOSITORIO EN GITHUB]()
 
