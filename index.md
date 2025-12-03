@@ -2,15 +2,15 @@
 ## [💾 Repositorio GitHub](https://github.com/hectorbafer/aso_hbf)
 ## Temas ⬇️
 
-### 📚 [UT01: REPOSITORIO EN GITHUB]()
+### 📚 [UT01: Repositorio en GitHub]()
 
 ### 🐧 Linux
-### [📚 UT02: INSTALACIÓN Y PUESTA EN MARCHA DE LINUX SERVER](ut02/index.md)
-### [📚 UT03: BASH SCRIPTING](ut03/index.md)
+### [📚 UT02: Instalación y puesta en marcha de Linux Server](ut02/index.md)
+### [📚 UT03: Lenguajes de scripting en Linux: Bash](ut03/index.md)
 
 ---
 
 ### 🪟 Windows
 
-### [📚 UT05: SERVICIO DE DIRECTORIO EN WINDOWS SERVER](ut05/index.md)
-### [📚 UT06: LENGUAJES DE SCRIPTING EN WINDOWS: POWERSHELL](ut06/index.md)
+### [📚 UT05: Servicio de directorio en Windows Server](ut05/index.md)
+### [📚 UT06: Lenguaje de scripting en Windows: Powershell](ut06/index.md)
