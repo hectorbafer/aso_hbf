@@ -2,7 +2,7 @@
 ## [💾 Repositorio GitHub](https://github.com/hectorbafer/aso_hbf)
 ## Temas ⬇️
 
-### 📚 [UT01: Repositorio en GitHub]()
+### [📚 UT01: Repositorio en GitHub]()
 
 ### 🐧 Linux
 ### [📚 UT02: Instalación y puesta en marcha de Linux Server](ut02/index.md)
