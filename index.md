@@ -13,3 +13,4 @@
 ### 🪟 Windows
 
 ### [📚 UT05: SERVICIO DE DIRECTORIO EN WINDOWS SERVER](ut05/index.md)
+### [📚 UT06: LENGUAJES DE SCRIPTING EN WINDOWS: POWERSHELL](ut06/index.md)
