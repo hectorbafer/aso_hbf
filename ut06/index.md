@@ -3,6 +3,7 @@
 ### [📄 PR0601: Introducción a Powershell](pr0601/pr0601.md)
 ### [📄 PR0602: El pipeline en Powershell](pr0602/pr0602.md)
 ### [📄 PR0603: Manipulación de cadenas](pr0603/pr0603.md)
+### [📄 PR0604: Manipulación de colecciones en PowerShell](pr0604/pr0604.md)
 
 ---
 ### [⬅️ Volver a la página principal](../index.md)
