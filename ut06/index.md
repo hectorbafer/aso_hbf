@@ -5,7 +5,7 @@
 ### [📄 PR0603: Manipulación de cadenas](pr0603/pr0603.md)
 ### [📄 PR0604: Manipulación de colecciones en PowerShell](pr0604/pr0604.md)
 ### [📄 PR0605: Limpieza de logs](pr0605/pr0605.md)
-
+### [📄 PR0606: Limpieza de logs (II)](pr0606/pr0606.md)
 ---
 ### [⬅️ Volver a la página principal](../index.md)
 ---
