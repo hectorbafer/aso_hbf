@@ -1,5 +1,5 @@
 # 📄 Proyecto de Módulo: Integración de Sistemas Heterogéneos
 
 ---
-### [⬅️ Volver a UT07](../index.md)
+### [⬅️ Volver a Proyecto de Módulo](../index.md)
 ---
