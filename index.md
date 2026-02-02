@@ -1,6 +1,7 @@
 # 💻 Página principal
 ## 💾 [Repositorio GitHub](https://github.com/hectorbafer/aso_hbf)
 ## Temas ⬇️
+### 📚 [Proyecto final de curso](proyecto/index.md)
 ### 📚 [UT01: Repositorio en GitHub]()
 ### 📚 [UT02: Instalación y puesta en marcha de Linux Server](ut02/index.md)
 ### 📚 [UT03: Lenguajes de scripting en Linux: Bash](ut03/index.md)
