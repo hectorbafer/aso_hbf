@@ -73,7 +73,7 @@ Desactivamos el **Firewall** de la misma manera que hicimos en nuestro **Windows
 > 💬 Para la práctica sí que podremos quitar el Firewall para evitar errores pero para un entorno real de empresa no se tendrá que desactivar.
 
 ### - Instalación de Active Directory en `Windows Server`
-Para instalar Active Directory (o AD), vamos a la parte superior derecha, clicamos en `Administrar` y `Agregar roles y características`.
+Para instalar **Active Directory** (o AD), vamos a la parte superior derecha, clicamos en `Administrar` y `Agregar roles y características`.
 
 ![agregarRoles](Imagenes/agregarRoles.png)
 
