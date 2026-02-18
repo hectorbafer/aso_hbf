@@ -197,7 +197,7 @@ El sistema realmd admite los siguientes tipos de dominios:
 - [Realmd (Red Hat)](https://docs.redhat.com/es/documentation/red_hat_enterprise_linux/7/html/windows_integration_guide/ch-configuring_authentication)
 
 ### 2. Resolución de nombres
-- **/etc/resolv.conf (DNS):** Active Directory no es solo una base de datos de usuarios, es una estructura de red que depende de registros DNS específicos (registros SRV). Si Linux no tiene configurado el DNS del `Controlador de Dominio` en este archivo, será incapaz de localizar dónde está el servidor de autenticación.
+- **/etc/resolv.conf (DNS):** `Active Directory` no es solo una base de datos de usuarios, es una estructura de red que depende de registros DNS específicos (registros SRV). Si Linux no tiene configurado el DNS del `Controlador de Dominio` en este archivo, será incapaz de localizar dónde está el servidor de autenticación.
 - **NTP (Sincronización de hora):** El protocolo `Kerberos` utiliza marcas de tiempo para evitar ataques de denegación (replay attacks). Si el reloj del servidor **Linux** difiere en más de 5 minutos del reloj del **Windows Server**, los tickets de Kerberos serán rechazados por *"caducados"* o *"inválidos"*, impidiendo el inicio de sesión.
 
 ### 3. Estrategia elegida
@@ -214,7 +214,7 @@ Linux y Windows no usan el mismo *"idioma"* para identificar a sus usuarios:
 - En **Linux**, los usuarios se identifican con números simples: el `UID` (User ID) y el `GID` (Group ID) (por ejemplo,`1001`).
 
 **¿Cómo se ponen de acuerdo?**  
-Para que Linux sepa a quién pertenece un archivo creado por un usuario de Windows, primero tiene que “traducir” ese SID a un UID. Ese proceso se llama ID Mapping.  
+Para que Linux sepa a quién pertenece un archivo creado por un usuario de Windows, primero tiene que “traducir” ese SID a un UID. Ese proceso se llama **ID Mapping**.  
 Para la solución, usamos `SSSD` con un mapeo algorítmico. Básicamente, SSSD toma el `SID` único del usuario de **Windows** y le aplica una fórmula matemática para convertirlo en un número `UID` válido en **Linux**, dentro de un rango definido (por ejemplo, entre `10 000` y `500 000`).
 
 **Así se logra algo muy importante:**  
