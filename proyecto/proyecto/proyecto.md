@@ -194,7 +194,7 @@ El sistema realmd admite los siguientes tipos de dominios:
 - [Kerberos (Wikipedia)](https://es.wikipedia.org/wiki/Kerberos)  
 - [Winbind (Red Hat)](https://docs.redhat.com/es/documentation/red_hat_enterprise_linux/8/html/integrating_rhel_systems_directly_with_windows_active_directory/connecting-rhel-systems-directly-to-ad-using-samba-winbind_integrating-rhel-systems-directly-with-active-directory)  
 - [SSSD (Red Hat)](https://docs.redhat.com/es/documentation/red_hat_enterprise_linux/8/html/configuring_authentication_and_authorization_in_rhel/understanding-sssd-and-its-benefits_configuring-authentication-and-authorization-in-rhel)  
-- [Realmd (Red Hat)](https://docs.redhat.com/es/documentation/red_hat_enterprise_linux/7/html/windows_integration_guide/ch-configuring_authentication)
+- [Realmd (Red Hat *inglés*)](https://docs.redhat.com/es/documentation/red_hat_enterprise_linux/7/html/windows_integration_guide/ch-configuring_authentication)
 
 ### 2. Resolución de nombres
 - **/etc/resolv.conf (DNS):** `Active Directory` no es solo una base de datos de usuarios, es una estructura de red que depende de registros DNS específicos (registros SRV). Si Linux no tiene configurado el DNS del `Controlador de Dominio` en este archivo, será incapaz de localizar dónde está el servidor de autenticación.
