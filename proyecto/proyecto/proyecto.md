@@ -183,12 +183,12 @@ Cuando tengamos a los usuarios creados y dentro del grupo asignado, nos quedará
 Proporciona una forma sencilla de descubrir y unirse a dominios de identidad para integrarse directamente en un dominio. Configura los servicios del sistema Linux, como SSSD o Winbind, para realizar la conexión.  
 Puede buscar los dominios de Active Directory y Identity Management disponibles y unir el sistema al dominio elegido, configurando también los servicios necesarios para gestionar el acceso de los usuarios. Además, como SSSD permite trabajar con varios dominios, realmd también puede detectar y usar varios dominios a la vez.  
 El sistema realmd admite los siguientes tipos de dominios:
-  - Microsoft Active Directory
-  - Red Hat Linux Identity Management
+  - Microsoft Active Directory.
+  - Red Hat Linux Identity Management.
 
   Los siguientes clientes de dominio son compatibles con realmd:
   - SSSD tanto para Red Hat Enterprise Linux Identity Management como para Microsoft Active Directory.
-  - Winbind para Microsoft Active Directory
+  - Winbind para Microsoft Active Directory.
 
 ### - Bibliografía
 - [Kerberos (Wikipedia)](https://es.wikipedia.org/wiki/Kerberos)  
