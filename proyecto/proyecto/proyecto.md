@@ -563,6 +563,10 @@ Salen estos errores:
 
 ![error](Imagenes/errorGeneral.png)
 
+Esperado un tiempo ya no se reinicia la interfaz gráfica, pero si ponemos el comando para ver si el usuario está dentro del grupo, se puede ver que sí está.
+
+![id](Imagenes/idUsuG1.png)
+
 ---
 ### [⬅️ Volver a Proyecto de Módulo](../index.md)
 ---
