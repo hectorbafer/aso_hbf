@@ -149,6 +149,120 @@ Cuando tengamos a los usuarios creados y dentro del grupo asignado, nos quedará
 
 
 ## 📌 Fase C: Implantación e interoperabilidad
+### 1. Configuración y unión a Active Directory
+Aquí vamos a trabajar la mayor parte con nuestro **Ubuntu Server**. Lo primero que haremos será editar el archivo `hosts` para añadir nuestro hostname al dominio de nuestro **Windows Server**. Pondremos el siguiente comando y añadimos lo que viene en la captura.
+```bash
+sudo nano /etc/hosts
+
+192.168.100.20   server-hbf.pry-hbf.local   server-hbf
+```
+
+![hosts](Imagenes/hosts.png)
+
+Actualizamos los paquetes e instalamos `chrony` para sincronizar la hora y luego editamos su archivo de configuración. Esto se usa por el protocolo de `Kerberos`.
+```bash
+sudo apt update
+sudo apt install chrony -y
+sudo nano /etc/chrony/chrony.conf
+```
+
+Pondremos esta línea al principio del las demás líneas que empiezen por pool, a la que tendremos que comentar para que solo apunte hacia nuestro Windows Server.
+```bash
+server 192.168.100.10 iburst
+```
+
+![chrony](Imagenes/chrony.png)
+
+Reiniciamos el servidor y comprobamos su estado.
+```bash
+sudo systemctl restart chrony
+sudo systemctl status chrony
+```
+
+![chronyStatus](Imagenes/chronyStatus.png)
+
+Ahora, instalaremos todas estas herramientas para quese permita la integración.  
+`Realmd` para que la unión se automatize.  
+`SSSD` para el caché y mapeo de identidades.  
+`Samba` para compartir los recursos
+```bash
+sudo apt install realmd sssd sssd-tools libnss-sss libpam-sss adcli samba samba-common-bin smbclient packagekit -y
+```
+
+Gracias a `realmd`, nos evitaremos editar varios archivos de configuración y todo ello se reduce a pocos comandos. Como por ejemplo, este comando que nos hará ver si detecta nuestro **Active Directory**.
+```bash
+realm discover pry-hbf.local
+```
+
+Veremos que en este caso, sí esta "viendo" nuestro **Active Directory**.
+
+![realmDiscover](Imagenes/realmDiscover.png)
+
+Lo que se hará ahora es si podremos unirnos a **Windows Server**. Para ellos pondremos el siguiente comando.
+```bash
+sudo realm join --user=Administrador pry-hbf.local
+```
+
+Podremos ver que sí ha funcionado porque no ha salido nada más después de la contraseña.
+
+![realmJoin](Imagenes/realmJoin.png)
+
+Para comprobar que ya nuestro Ubuntu Server puede leer la base de datos del **Active Directory**, haremos la prueba con un usuario, en este caso, `UsuV1`. Ponemos el siguiente comando:
+```bash
+id UsuV1@pry-hbf.local
+```
+
+Vemos que aparece incluso el grupo de usuarios al que pertenece, por lo que sí lee la base de datos.
+
+![prueba](Imagenes/pruebaUsuario.png)
+
+### 2. Configuración de Samba y ACLs
+Ya teniendo nuestro Ubuntu Server reconociendo al 100% Active Directory, configuraremos Samba para poder compartir los recursos por la red.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ---
