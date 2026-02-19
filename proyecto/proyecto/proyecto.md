@@ -154,7 +154,7 @@ Aquí vamos a trabajar la mayor parte con nuestro **Ubuntu Server**. Lo primero 
 ```bash
 sudo nano /etc/hosts
 
-192.168.100.20   server-hbf.pry-hbf.local   server-hbf
+192.168.100.20 server-hbf.pry-hbf.local server-hbf
 ```
 
 ![hosts](Imagenes/hosts.png)
