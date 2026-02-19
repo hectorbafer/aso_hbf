@@ -13,10 +13,7 @@ Como el equipo técnico actual desconoce cómo conectar ambos mundos, se te ha e
 **3.** Implementar la solución investigada para unir el servidor Linux al dominio.  
 **4.** Configurar Samba para compartir recursos utilizando ACLs basadas en usuarios/grupos del dominio (no locales).  
 
-## 📌 Fases de Ejecución
-### Fase A: Infraestructura base
----
-
+## 📌 Fase A: Infraestructura base
 Para el proyecto usaré las siguientes máquinas con dos adaptadores de red, una en **red interna** para que se comuniquen y la otra en **NAT**. Las versiones que he usado son:
 - Windows Server 2025
 - Ubuntu Server 24.04
@@ -30,7 +27,7 @@ Para el proyecto usaré las siguientes máquinas con dos adaptadores de red, una
 
 > 💬 No hará falta poner la puerta de enlace porque sería para que saliese hacia un router que en este caso no existe.
 
-### - Configuración de `Windows Server`
+### Configuración de `Windows Server`
 Pulsamos la combinación de teclas `Win+X` y escribimos `ncpa.cpl`, hacemos clic derecho en el adaptador de red y clicamos en `Propiedades`. Luego, clicamos en `Protocolo de Internet versión 4 (TCP/IPv4)` y pondremos lo siguiente:
 
 ![ipWS](Imagenes/ipWS.png)
@@ -45,7 +42,7 @@ Lo que haremos ahora por si acaso, será desactivar el **Firewall**. Desde el **
 
 > 💬 Para la práctica sí que podremos quitar el Firewall para evitar errores pero para un entorno real de empresa no se tendrá que desactivar.
 
-### - Configuración de `Ubuntu Server`
+### Configuración de `Ubuntu Server`
 Editamos el archivo de configuración para poner la IP estática, pondremos este comando:
 ```bash
 sudo nano /etc/netplan/50-cloud-init.yaml
@@ -57,7 +54,7 @@ Aplicamos los cambios con el comando `sudo netplan apply`. Para ver la IP pondre
 
 ![ifconfigU](Imagenes/ifconfigU.png)
 
-### - Configuración de `Windows 10`
+### Configuración de `Windows 10`
 Hacemos la combinación de teclas `Win+X` y escribimos `ncpa.cpl`, hacemos clic derecho en el adaptador de red y clicamos en `Propiedades`. Luego, clicamos en `Protocolo de Internet versión 4 (TCP/IPv4)` y pondremos lo siguiente:
 
 ![ipW](Imagenes/ipW.png)
@@ -72,7 +69,7 @@ Desactivamos el **Firewall** de la misma manera que hicimos en nuestro **Windows
 
 > 💬 Para la práctica sí que podremos quitar el Firewall para evitar errores pero para un entorno real de empresa no se tendrá que desactivar.
 
-### - Instalación de Active Directory en `Windows Server`
+### Instalación de Active Directory en `Windows Server`
 Para instalar **Active Directory** (o AD), vamos a la parte superior derecha, clicamos en `Administrar` y `Agregar roles y características`.
 
 ![agregarRoles](Imagenes/agregarRoles.png)
@@ -151,8 +148,7 @@ Cuando tengamos a los usuarios creados y dentro del grupo asignado, nos quedará
 ![usuariosG](Imagenes/usuariosG.png)
 
 
-### Fase C: Implantación e interoperabilidad
----
+## 📌 Fase C: Implantación e interoperabilidad
 
 
 ---
