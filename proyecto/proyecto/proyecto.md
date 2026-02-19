@@ -147,6 +147,19 @@ Cuando tengamos a los usuarios creados y dentro del grupo asignado, nos quedará
 
 ![usuariosG](Imagenes/usuariosG.png)
 
+### Meter Windows 10 al dominio
+Para meter nuestro Windows 10 al dominio, iremos hacia `Configuración → Sistema → Acerca de` y en la parte de la derecha, clicamos en `Cambiar el nombre de este equipo (Avanzado)`.  
+En la primera pestaña, que es la que nos aparece, clicamos en `Cambiar...` y en **Dominio** pondremos el dominio de **Windows Server**.
+
+![dominio](Imagenes/dominio.png)
+
+Nos pide las credenciales del administrador de Windows Server. Ponemos la cuenta del administrador.
+
+![credenciales](Imagenes/credenciales.png)
+
+Ahora tendremos que reiniciar el equipo. Luego, podremos ver si el equipo se ha unido yendo hacia nuestro Windows Server e ir hacia `Herramientras → Usuarios y equipos de Active Directory`, clicamos en Computers y veremos que ya lo tendremos conectado.
+
+![equipoConectado](Imagenes/equipoConectado.png)
 
 ## 📌 Fase C: Implantación e interoperabilidad
 ### 1. Configuración y unión a Active Directory
@@ -182,9 +195,10 @@ sudo systemctl status chrony
 ![chronyStatus](Imagenes/chronyStatus.png)
 
 Ahora, instalaremos todas estas herramientas para quese permita la integración.  
-`Realmd` para que la unión se automatize.  
-`SSSD` para el caché y mapeo de identidades.  
-`Samba` para compartir los recursos
+- `Realmd` para que la unión se automatize.  
+- `SSSD` para el caché y mapeo de identidades.  
+- `Samba` para compartir los recursos.
+
 ```bash
 sudo apt install realmd sssd sssd-tools libnss-sss libpam-sss adcli samba samba-common-bin smbclient packagekit -y
 ```
@@ -216,40 +230,156 @@ Vemos que aparece incluso el grupo de usuarios al que pertenece, por lo que sí 
 
 ![prueba](Imagenes/pruebaUsuario.png)
 
+También podemos verlo si vamos a Windows Server.
+
+![equipoConectado1](Imagenes/equipoConectado1.png)
+
 ### 2. Configuración de Samba y ACLs
 Ya teniendo nuestro Ubuntu Server reconociendo al 100% Active Directory, configuraremos Samba para poder compartir los recursos por la red.
 
+Haremos una copia de seguridad el archivo de configuración de samba para luego configurar el archivo. Pondremos lo siguiente:
+```bash
+sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
+sudo nano /etc/samba/smb.conf
+```
 
+Dentro del archivo, tendremos que poner toda esta configuración:
+> 💬 He puesto comentarios por medio para saber que es lo qué hace cada cosa, podemos quitarlos a la hora de ponerlo en el archivo y no pasaría nada.
 
+```bash
+[global]
+   # Configuración de Identidad
+   workgroup = PRY-HBF
+   security = ads
+   realm = PRY-HBF.LOCAL
 
+   # Registros y Logs
+   log file = /var/log/samba/%m.log
+   log level = 1
 
+   # CONFIGURACIÓN DE MAPEO DE IDENTIDAD (ID MAPPING)
 
+   # Rango para usuarios locales de la máquina Linux
+   idmap config * : backend = tdb
+   idmap config * : range = 3000-7999
+   
+   # Rango para los usuarios del dominio (Gestionado por SSSD)
+   idmap config PRY-HBF : backend = sss
+   idmap config PRY-HBF : range = 10000-500000
 
+   # Soporte para Listas de Control de Acceso (ACLs) de Windows
+   vfs objects = acl_xattr
+   map acl inherit = yes
+   store dos attributes = yes
 
+   # Desactivar soporte de impresoras (evita errores en logs)
+   load printers = no
+   printing = bsd
+   printcap name = /dev/null
+   disable spoolss = yes
 
+# CARPETAS COMPARTIDAS
 
+[Ventas]
+   comment = Departamento de Ventas
+   path = /srv/samba/ventas
+   read only = no
+   browseable = yes
+   # Solo el grupo G_Ventas de AD puede entrar
+   valid users = "@G_Ventas@pry-hbf.local"
+   force group = "Usuarios del dominio@pry-hbf.local"
+   create mask = 0660
+   directory mask = 0770
 
+[IT]
+   comment = Departamento de IT
+   path = /srv/samba/it
+   read only = no
+   browseable = yes
+   # Solo el grupo G_IT de AD puede entrar
+   valid users = "@G_IT@pry-hbf.local"
+   force group = "Usuarios del dominio@pry-hbf.local"
+   create mask = 0660
+   directory mask = 0770
 
+[Gerencia]
+   comment = Departamento de Gerencia
+   path = /srv/samba/gerencia
+   read only = no
+   browseable = yes
+   # Solo el grupo G_Gerencia de AD puede entrar
+   valid users = "@G_Gerencia@pry-hbf.local"
+   force group = "Usuarios del dominio@pry-hbf.local"
+   create mask = 0660
+   directory mask = 0770
+```
 
+Quitando los comentarios, nos tendría que quedar de esta manera:
 
+![smbGlobal](Imagenes/smbGlobal.png)
 
+![smbCarpetas](Imagenes/smbCarpetas.png)
 
+Reiniciamos el servidor y comprobamos su estado.
+```bash
+sudo systemctl restart smbd nmbd
+sudo systemctl status smbd
+```
 
+![smbdStatus](Imagenes/smbdStatus.png)
 
+Podemos hacer una comprobación rápida desde localhost para comprobar si hemos hecho bien la configuración. Para ello pondremos este comando:
+```bash
+smbclient -L localhost -N
+```
 
+Vemos que sí podemos ver las carpetas.
 
+![pruebaSamba](Imagenes/pruebaSamba.png)
 
+El siguiente paso será hacer los directorios y permisos necesarios, es decir, que cada grupo tenga su carpeta y no la de otro. Procedemos a poner toda esta configuración:
+> 💬 He vuelto a poner comentarios para saber bien qué hace cada apartado.
 
+```bash
+# Crear las estructuras de directorios
+sudo mkdir -p /srv/samba/ventas
+sudo mkdir -p /srv/samba/it
+sudo mkdir -p /srv/samba/gerencia
 
+# Asignar propiedad (Usuario root, Grupo de AD)
+sudo chown root:"G_Ventas@pry-hbf.local" /srv/samba/ventas
+sudo chown root:"G_IT@pry-hbf.local" /srv/samba/it
+sudo chown root:"G_Gerencia@pry-hbf.local" /srv/samba/gerencia
 
+# Asignar permisos estrictos (770: Dueño y Grupo control total, Otros nada)
+sudo chmod 770 /srv/samba/ventas
+sudo chmod 770 /srv/samba/it
+sudo chmod 770 /srv/samba/gerencia
+```
 
+![carpetasPermisos](Imagenes/carpetasPermisos.png)
 
+### Comprobación final
+Para ver que todo haya funcionado, iremos a nuestra máquina de **Windows 10** e iniciamos sesión con un usuario, por ejemplo, voy a hacerlo con el usuario `UsuV1`.
 
+### Errores e intento de solución
+He puesto todos estos comandos en Windows 10 desde Powershell como administrador para solucionarlo.
+```powershell
+ipconfig /flushdns
+nbtstat -R
+nbtstat -RR
+net stop workstation /y
+net start workstation
+netsh int ip reset
+netsh winsock reset
+net use * /delete /y
+klist purge
+net use X: \\192.168.100.20\Ventas /user:PRY-HBF\UsuV1 * (error 1311)
+```
 
+También he desactivado el Firewall del dominio tanto en Windows Server como en Windows 10 y tampoco se ha conectado.
 
-
-
-
+### Método clásico
 
 
 
