@@ -150,79 +150,10 @@ Cuando tengamos a los usuarios creados y dentro del grupo asignado, nos quedará
 
 ![usuariosG](Imagenes/usuariosG.png)
 
-### Fase B: Investigación
----
-
-### 1. Análisis de herramientas
-
-- **Kerberos:**  
-  Es un protocolo de autenticación de redes de ordenador que permite a dos ordenadores en una red insegura demostrar su identidad mutuamente de manera segura. Se concentraron primeramente en un modelo de `cliente-servidor`, y brinda autenticación mutua: tanto cliente como servidor verifican la identidad uno del otro.  
-  Kerberos se basa en criptografía de clave simétrica y requiere un tercero de confianza.
-  - **Función:** Cuando un usuario intenta acceder, no envía su contraseña por la red en texto plano. En su lugar, solicita un `"Ticket" (TGT)` al controlador de dominio `(KDC - Key Distribution Center)`. Si el ticket es válido, Linux le deja pasar.
-  - **Importancia:** Sin Kerberos configurado `(krb5-user en Linux)`, no hay forma segura de validar que la contraseña del usuario es correcta sin exponerla.
-
-- **Winbind:**  
- Es un emulador de un cliente de Windows en Linux y que se comunica con los servidores de **Active Directory**.  
- Se puede usar realmd para configurar `Samba Winbind`:
-  - Configurar la autenticación de la red y la pertenencia a un dominio de forma estándar.
-  - Descubrir automáticamente la información sobre los dominios accesibles.
-  - No requiere una configuración avanzada para unirse a un dominio.
- 
-   Hay que tener en cuenta lo siguiente:
-  - La integración directa con Winbind en una configuración AD multiforestal requiere confianzas bidireccionales.
-  - Los bosques remotos deben confiar en el bosque local para garantizar que el complemento `idmap_ad` maneje correctamente a los usuarios del bosque remoto.
-
-- **SSSD:**  
- Es un servicio del sistema que permite acceder a directorios remotos y mecanismos de autenticación. Funciona en dos etapas:
-  - Conecta al cliente con un proveedor remoto para recuperar la información de identidad y autenticación.
-  - Utiliza la información de autenticación obtenida para crear una caché local de usuarios y credenciales en el cliente.
-
-  Los usuarios del sistema local pueden entonces autenticarse utilizando las cuentas de usuario almacenadas en el proveedor remoto.
-
-- **Realmd:**  
-Proporciona una forma sencilla de descubrir y unirse a dominios de identidad para integrarse directamente en un dominio. Configura los servicios del sistema Linux, como SSSD o Winbind, para realizar la conexión.  
-Puede buscar los dominios de Active Directory y Identity Management disponibles y unir el sistema al dominio elegido, configurando también los servicios necesarios para gestionar el acceso de los usuarios. Además, como SSSD permite trabajar con varios dominios, realmd también puede detectar y usar varios dominios a la vez.  
-El sistema realmd admite los siguientes tipos de dominios:
-  - Microsoft Active Directory.
-  - Red Hat Linux Identity Management.
-
-  Los siguientes clientes de dominio son compatibles con realmd:
-  - SSSD tanto para Red Hat Enterprise Linux Identity Management como para Microsoft Active Directory.
-  - Winbind para Microsoft Active Directory.
-
-### - Bibliografía
-- [Kerberos (Wikipedia)](https://es.wikipedia.org/wiki/Kerberos)  
-- [Winbind (Red Hat)](https://docs.redhat.com/es/documentation/red_hat_enterprise_linux/8/html/integrating_rhel_systems_directly_with_windows_active_directory/connecting-rhel-systems-directly-to-ad-using-samba-winbind_integrating-rhel-systems-directly-with-active-directory)  
-- [SSSD (Red Hat)](https://docs.redhat.com/es/documentation/red_hat_enterprise_linux/8/html/configuring_authentication_and_authorization_in_rhel/understanding-sssd-and-its-benefits_configuring-authentication-and-authorization-in-rhel)  
-- [Realmd (Red Hat *inglés*)](https://docs.redhat.com/es/documentation/red_hat_enterprise_linux/7/html/windows_integration_guide/ch-configuring_authentication)
-
-### 2. Resolución de nombres
-- **/etc/resolv.conf (DNS):** `Active Directory` no es solo una base de datos de usuarios, es una estructura de red que depende de registros DNS específicos (registros SRV). Si Linux no tiene configurado el DNS del `Controlador de Dominio` en este archivo, será incapaz de localizar dónde está el servidor de autenticación.
-- **NTP (Sincronización de hora):** El protocolo `Kerberos` utiliza marcas de tiempo para evitar ataques de denegación (replay attacks). Si el reloj del servidor **Linux** difiere en más de 5 minutos del reloj del **Windows Server**, los tickets de Kerberos serán rechazados por *"caducados"* o *"inválidos"*, impidiendo el inicio de sesión.
-
-### 3. Estrategia elegida
-Para este proyecto se ha elegido por la **Opción Moderna**, utilizando `SSSD` y `Realmd`.
-
-**Justificación:**
-- **Facilidad de despliegue:** `Realmd` reduce el proceso de unión a un único comando `(realm join)`, configurando automáticamente la confianza entre sistemas.
-- **Rendimiento:** `SSSD` es más eficiente gestionando las peticiones de identidad y permite una gestión más limpia de los permisos mediante el uso de nombres de usuario legibles (por ejemplo, `usuario@dominio.local`).
-- **Soporte:** Es la arquitectura recomendada por las distribuciones modernas (Ubuntu, RHEL, Debian) para entornos empresariales actuales.
-
-### 4. Mapeo de identidad
-Linux y Windows no usan el mismo *"idioma"* para identificar a sus usuarios:
-- En **Windows**, cada usuario tiene un `SID` (Security Identifier), que es una cadena larga y única llena de números y letras (por ejemplo, `S-1-5-21-36...`).
-- En **Linux**, los usuarios se identifican con números simples: el `UID` (User ID) y el `GID` (Group ID) (por ejemplo,`1001`).
-
-**¿Cómo se ponen de acuerdo?**  
-Para que Linux sepa a quién pertenece un archivo creado por un usuario de Windows, primero tiene que “traducir” ese SID a un UID. Ese proceso se llama **ID Mapping**.  
-Para la solución, usamos `SSSD` con un mapeo algorítmico. Básicamente, SSSD toma el `SID` único del usuario de **Windows** y le aplica una fórmula matemática para convertirlo en un número `UID` válido en **Linux**, dentro de un rango definido (por ejemplo, entre `10 000` y `500 000`).
-
-**Así se logra algo muy importante:**  
-El mismo usuario de **Windows** siempre obtiene el mismo `UID` en **Linux**, sin que tengamos que crear usuarios manualmente en archivos como `/etc/passwd`. Es una traducción automática y consistente entre ambos sistemas.
 
 ### Fase C: Implantación e interoperabilidad
 ---
-<!-- ejemplo: https://docs.redhat.com/es/documentation/red_hat_enterprise_linux/8/html/integrating_rhel_systems_directly_with_windows_active_directory/connecting-to-multiple-domains-different-ad-forests-sssd_connecting-directly-to-ad -->
+
 
 ---
 ### [⬅️ Volver a Proyecto de Módulo](../index.md)
