@@ -363,7 +363,7 @@ sudo chmod 770 /srv/samba/gerencia
 Para ver que todo haya funcionado, iremos a nuestra máquina de **Windows 10** e iniciamos sesión con un usuario, por ejemplo, voy a hacerlo con el usuario `UsuV1`.
 
 ### Errores e intento de solución
-He puesto todos estos comandos en Windows 10 desde Powershell como administrador para solucionarlo.
+He puesto todos estos comandos en **Windows 10** desde **Powershell** como `administrador` para solucionarlo.
 ```powershell
 ipconfig /flushdns
 nbtstat -R
@@ -377,7 +377,7 @@ klist purge
 net use X: \\192.168.100.20\Ventas /user:PRY-HBF\UsuV1 * (error 1311)
 ```
 
-También he desactivado el Firewall del dominio tanto en Windows Server como en Windows 10 y tampoco se ha conectado.
+También he desactivado el **Firewall** del dominio tanto en **Windows Server** como en **Windows 10** y tampoco se ha conectado.
 
 ### Método clásico
 Antes de comenzar he hecho una instantánea a las máquinas en caso de que haya pasado un error, como ha sido en este caso, así que procedo a hacer el método clásico (Samba + Winbind).
