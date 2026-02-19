@@ -359,7 +359,7 @@ sudo chmod 770 /srv/samba/gerencia
 
 ![carpetasPermisos](Imagenes/carpetasPermisos.png)
 
-### Comprobación final
+### 3. Comprobación final
 Para ver que todo haya funcionado, iremos a nuestra máquina de **Windows 10** e iniciamos sesión con un usuario, por ejemplo, voy a hacerlo con el usuario `UsuV1`.
 
 ### Errores e intento de solución
@@ -380,20 +380,188 @@ net use X: \\192.168.100.20\Ventas /user:PRY-HBF\UsuV1 * (error 1311)
 También he desactivado el Firewall del dominio tanto en Windows Server como en Windows 10 y tampoco se ha conectado.
 
 ### Método clásico
+Antes de comenzar he hecho una instantánea a las máquinas en caso de que haya pasado un error, como ha sido en este caso, así que procedo a hacer el método clásico (Samba + Winbind).
 
+Instalamos las siguientes herramientas:
+```bash
+sudo apt install samba krb5-config krb5-user winbind libnss-winbind libpam-winbind -y
+```
 
+Durante la instalación de `krb5-config` se nos pedirá el `Default Kerberos Realm`, que en mi caso es **PRY-HBF.LOCAL**. Es importante ponerlo en mayúsculas.
 
+![Kerberos](Imagenes/clasicoKerberos.png)
 
+Editamos el archivo de configuración con el siguiente comando:
+```bash
+nano /etc/krb5.conf
+```
 
+Ponemos lo siguiente:
+```bash
+[libdefaults]
+    default_realm = PRY-HBF.LOCAL
+    dns_lookup_realm = false
+    dns_lookup_kdc = true
 
+[realms]
+    PRY-HBF.LOCAL = {
+        kdc = 192.168.100.10
+        admin_server = 192.168.100.10
+    }
 
+[domain_realm]
+    .pry-hbf.local = PRY-HBF.LOCAL
+    pry-hbf.local = PRY-HBF.LOCAL
+```
 
+![krb5](Imagenes/clasicoKrb5.png)
 
+El siguiente archivo que hay que configurar es el de `Samba`. Editamos el archivo y pondremos lo siguiente:
+```bash
+[global]
+   workgroup = PRY-HBF
+   security = ADS
+   realm = PRY-HBF.LOCAL
 
+   idmap config * : backend = tdb
+   idmap config * : range = 3000-7999
+   idmap config PRY-HBF : backend = rid
+   idmap config PRY-HBF : range = 10000-999999
 
+   template shell = /bin/bash
+   template homedir = /home/%U
 
+   winbind use default domain = true
+   winbind offline logon = false
+```
 
+![general](Imagenes/clasicoGeneral.png)
 
+Lo siguiente será configurar el archivo nsswitch.conf. Pondremos el siguiente comando:
+```bash
+sudo nano /etc/nsswitch.conf
+```
+
+Ponemos lo siguiente:
+```bash
+passwd:     files winbind
+group:      files winbind
+```
+
+![nsswitch](Imagenes/clasicoNsswitch.png)
+
+Ahora nos conectaremos al Active Directory con el siguiente comando:
+```bash
+sudo net ads join -U Administrador
+```
+
+Vemos que sí hemos podido acceder porque sale el mensaje `Joined 'SERVER-HBF' to dns domain 'pry-hbf.local'`
+
+![join](Imagenes/clasicoJoin.png)
+
+Reiniciamos los servicios y comprobamos el estado de de `winbin` y `samba` con el siguiente comando:
+```bash
+sudo systemctl restart winbind smbd nmbd
+sudo systemctl status winbind
+sudo systemctl status smbd
+```
+
+![status](Imagenes/clasicoStatus.png)
+
+Ahora listaremos los usuarios con el comando `wbinfo -u`.
+
+![usuarios](Imagenes/clasicoUsuarios.png)
+
+Listamos los grupos con wbinfo -g
+
+![grupos](Imagenes/clasicoGrupos.png)
+
+Editamos otra vez el archivo de Samba y pondremos lo mismo que cuando se hizo el método moderno (lo anterior).
+```bash
+[ventas]
+   comment = Departamento de Ventas
+   path = /srv/samba/ventas
+   browseable = yes
+   read only = no
+   guest ok = no
+   valid users = "@PRY-HBF\G_Ventas"
+   force group = "PRY-HBF\G_Ventas"
+   directory mask = 0770
+   create mask = 0770
+
+[IT]
+   comment = Departamento de IT
+   path = /srv/samba/it
+   browseable = yes
+   read only = no
+   guest ok = no
+   valid users = "@PRY-HBF\G_IT"
+   force group = "PRY-HBF\G_IT"
+   directory mask = 0770
+   create mask = 0770
+
+[Gerencia]
+   comment = Departamento de Gerencia
+   path = /srv/samba/gerencia
+   browseable = yes
+   read only = no
+   guest ok = no
+   valid users = "@PRY-HBF\G_Gerencia"
+   force group = "PRY-HBF\G_Gerencia"
+   directory mask = 0770
+   create mask = 0770
+```
+
+![samba](Imagenes/clasicoCarpetas.png)
+
+Creamos los directorios y carpetas necesarios.
+```bash
+sudo mkdir -p /srv/samba/ventas /srv/samba/it /srv/samba/gerencia
+
+sudo chgrp "G_Ventas" /srv/samba/ventas
+sudo chgrp "G_IT" /srv/samba/it
+sudo chgrp "G_Gerencia" /srv/samba/gerencia
+
+sudo chmod -R 770 /srv/samba/
+```
+
+![permisos](Imagenes/clasicoPermisos.png)
+
+Volvemos a reiniciar los servicios y a comprobar el estado.
+```bash
+sudo systemctl restart winbind smbd nmbd
+sudo systemctl status winbind
+sudo systemctl status smbd
+```
+
+### Errores y soluciones
+Por algún motivo solo se ven las carpetas de `IT` y `Gerencia`, no existe la carpeta de `ventas`. Hacemos la prueba con un usuario que pertenezca a esas carpetas, por ejemplo `UsuG1`.
+
+Al poner `\\192.168.100.20` sí se pueden ver las carpetas pero al clicar en cualquiera de las dos, la interfaz grafica se resetea. Pasa lo mismo cuando inicio sesión con el usuario `UsuIT1`. Pero lo que sí funcionó en su momento fue que al estar con el usuario `UsuG1` e intentaba acceder a la carpeta de `IT`, me pedía las credenciales y ponía el mensaje de `Acceso denegado`.
+
+He comprobado si tiene la IP correcta en **Windows 10**, he probado con el comando ping tanto hacia **Windows Server** como a **Ubuntu Server** y se comunica.
+
+![ping](Imagenes/ping.png)
+
+También hubo un error en la hora de Ubuntu Server que estaba una hora retrasada, se ha tenido que instalar el siguiente paquete y poner los siguientes comandos:
+```bash
+sudo apt install ntpdate -y
+sudo ntpdate 192.168.100.10
+sudo timedatectl set-ntp no
+sudo date -s "2026-02-19 23:45:00"
+```
+
+He reseteado otra vez los servicios de `winbind` y `samba` y tampoco ha dado resultado.
+
+He probado a hacer lo mismo con los usuarios pero en **Windows Server** y hace lo mismo que en **Windows 10**.
+
+Tanto en el modo clásico como en el moderno no se puede acceder a las carpetas.
+
+Salen estos errores:
+
+![error](Imagenes/errorGerencia.png)
+
+![error](Imagenes/errorGeneral.png)
 
 ---
 ### [⬅️ Volver a Proyecto de Módulo](../index.md)
